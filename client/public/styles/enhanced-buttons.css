@@ -1,0 +1,281 @@
+/* Enhanced Button Styles for Y.E. Quiz Platform */
+
+/* Base button styles */
+.btn-enhanced {
+  position: relative;
+  overflow: hidden;
+  border: none;
+  border-radius: 12px;
+  padding: 12px 24px;
+  font-weight: 600;
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(10px);
+}
+
+.btn-enhanced::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: left 0.5s;
+}
+
+.btn-enhanced:hover::before {
+  left: 100%;
+}
+
+.btn-enhanced:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
+.btn-enhanced:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Primary button */
+.btn-primary-enhanced {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+}
+
+.btn-primary-enhanced:hover {
+  background: linear-gradient(135deg, #5a6fd8 0%, #6a4190 100%);
+  color: white;
+}
+
+/* Success button */
+.btn-success-enhanced {
+  background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+  color: white;
+}
+
+.btn-success-enhanced:hover {
+  background: linear-gradient(135deg, #0e8678 0%, #32d96a 100%);
+  color: white;
+}
+
+/* Danger button */
+.btn-danger-enhanced {
+  background: linear-gradient(135deg, #ff416c 0%, #ff4b2b 100%);
+  color: white;
+}
+
+.btn-danger-enhanced:hover {
+  background: linear-gradient(135deg, #e63946 0%, #e63946 100%);
+  color: white;
+}
+
+/* Warning button */
+.btn-warning-enhanced {
+  background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+  color: white;
+}
+
+.btn-warning-enhanced:hover {
+  background: linear-gradient(135deg, #ed7fb8 0%, #f24458 100%);
+  color: white;
+}
+
+/* Info button */
+.btn-info-enhanced {
+  background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+  color: white;
+}
+
+.btn-info-enhanced:hover {
+  background: linear-gradient(135deg, #3d8bfe 0%, #00d4fe 100%);
+  color: white;
+}
+
+/* Secondary button */
+.btn-secondary-enhanced {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  opacity: 0.8;
+}
+
+.btn-secondary-enhanced:hover {
+  opacity: 1;
+  color: white;
+}
+
+/* Outline buttons */
+.btn-outline-enhanced {
+  background: rgba(255, 255, 255, 0.1);
+  border: 2px solid;
+  backdrop-filter: blur(10px);
+}
+
+.btn-outline-primary-enhanced {
+  border-color: #667eea;
+  color: #667eea;
+}
+
+.btn-outline-primary-enhanced:hover {
+  background: #667eea;
+  color: white;
+}
+
+/* Floating Action Button */
+.btn-fab {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 1000;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.btn-fab:hover {
+  transform: scale(1.1);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+}
+
+/* Pulse animation */
+@keyframes pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(102, 126, 234, 0.7);
+  }
+  70% {
+    box-shadow: 0 0 0 10px rgba(102, 126, 234, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(102, 126, 234, 0);
+  }
+}
+
+.btn-pulse {
+  animation: pulse 2s infinite;
+}
+
+/* Loading state */
+.btn-loading {
+  pointer-events: none;
+  opacity: 0.7;
+}
+
+.btn-loading::after {
+  content: '';
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  margin: auto;
+  border: 2px solid transparent;
+  border-top-color: currentColor;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Icon buttons */
+.btn-icon {
+  padding: 8px;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Glass morphism effect */
+.btn-glass {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: white;
+}
+
+.btn-glass:hover {
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+}
+
+/* Neon effect */
+.btn-neon {
+  background: transparent;
+  border: 2px solid #667eea;
+  color: #667eea;
+  text-shadow: 0 0 10px #667eea;
+  box-shadow: 0 0 20px rgba(102, 126, 234, 0.3);
+}
+
+.btn-neon:hover {
+  background: #667eea;
+  color: white;
+  box-shadow: 0 0 30px rgba(102, 126, 234, 0.6);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .btn-enhanced {
+    padding: 10px 20px;
+    font-size: 13px;
+  }
+  
+  .btn-fab {
+    width: 48px;
+    height: 48px;
+    bottom: 16px;
+    right: 16px;
+    font-size: 20px;
+  }
+}
+
+/* Dark theme adjustments */
+[data-theme="dark"] .btn-glass {
+  background: rgba(0, 0, 0, 0.3);
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+[data-theme="dark"] .btn-glass:hover {
+  background: rgba(0, 0, 0, 0.5);
+}
+
+/* Button groups */
+.btn-group-enhanced {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.btn-group-enhanced .btn-enhanced {
+  flex: 1;
+  min-width: 120px;
+}
+
+@media (max-width: 576px) {
+  .btn-group-enhanced {
+    flex-direction: column;
+  }
+  
+  .btn-group-enhanced .btn-enhanced {
+    width: 100%;
+  }
+}
+

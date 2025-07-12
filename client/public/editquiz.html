@@ -1,0 +1,666 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Edit Quiz</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"/>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet"/>
+  <style>
+    :root {
+      --bg-light: #f8f9fc; --bg-dark: #121212;
+      --card-light: #ffffff; --card-dark: #1e1e2e;
+      --text-light: #212529; --text-dark: #e0e0e0;
+      --accent: #4facfe;
+    }
+    [data-theme="light"] body { background: var(--bg-light); color: var(--text-light); }
+    [data-theme="dark"] body { background: var(--bg-dark); color: var(--text-dark); }
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      padding-bottom: 80px;
+      transition: .3s;
+      animation: fadeIn 0.4s ease;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .navbar {
+      background: var(--accent);
+      animation: slideDown .5s;
+    }
+    @keyframes slideDown {
+      from {transform:translateY(-100%);opacity:0;}
+      to {transform:translateY(0);opacity:1;}
+    }
+    .container { margin-top: 2rem; max-width: 900px; }
+    .question-card {
+      background: var(--card-light);
+      border-radius:8px;
+      box-shadow:0 4px 10px rgba(0,0,0,0.1);
+      margin-bottom:1rem;
+      transition: transform .2s, background .3s;
+    }
+    [data-theme="dark"] .question-card {
+      background: var(--card-dark);
+      color: var(--text-dark);
+    }
+    .question-card:hover { transform: translateY(-3px); }
+    .btn-floating {
+      position: fixed;
+      bottom: 80px;
+      right: 30px;
+      border-radius: 50%;
+      width:60px; height:60px;
+      font-size:1.5rem;
+      background: var(--accent);
+      color: white;
+      box-shadow:0 4px 14px rgba(0,0,0,0.2);
+      border:none;
+      transition: background .2s;
+      z-index: 1000;
+    }
+    .btn-floating:hover { background: #007eb8; }
+    
+    /* Modern Button Styles */
+    .modern-btn {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      border: none;
+      color: white;
+      padding: 12px 24px;
+      border-radius: 25px;
+      font-weight: 600;
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+      position: relative;
+      overflow: hidden;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .modern-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+      color: white;
+    }
+
+    .modern-btn:active {
+      transform: translateY(0);
+      box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+    }
+
+    .modern-btn::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+      transition: left 0.5s;
+    }
+
+    .modern-btn:hover::before {
+      left: 100%;
+    }
+
+    .btn-success-modern {
+      background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+      box-shadow: 0 4px 15px rgba(17, 153, 142, 0.3);
+    }
+
+    .btn-success-modern:hover {
+      box-shadow: 0 8px 25px rgba(17, 153, 142, 0.4);
+    }
+
+    .btn-danger-modern {
+      background: linear-gradient(135deg, #ff416c 0%, #ff4b2b 100%);
+      box-shadow: 0 4px 15px rgba(255, 65, 108, 0.3);
+    }
+
+    .btn-danger-modern:hover {
+      box-shadow: 0 8px 25px rgba(255, 65, 108, 0.4);
+    }
+
+    .btn-outline-modern {
+      background: transparent;
+      border: 2px solid var(--accent);
+      color: var(--accent);
+      box-shadow: none;
+    }
+
+    .btn-outline-modern:hover {
+      background: var(--accent);
+      color: white;
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(79, 172, 254, 0.3);
+    }
+
+    .btn-floating {
+      background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%) !important;
+      box-shadow: 0 6px 20px rgba(17, 153, 142, 0.4);
+      transition: all 0.3s ease;
+    }
+
+    .btn-floating:hover {
+      background: linear-gradient(135deg, #0d7377 0%, #2dd4bf 100%) !important;
+      transform: translateY(-3px);
+      box-shadow: 0 10px 30px rgba(17, 153, 142, 0.5);
+    }
+    .form-option {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-bottom: 0.5rem;
+    }
+    .form-option input[type="text"] {
+      flex: 1;
+      background-color: inherit;
+      color: inherit;
+    }
+    .form-option .form-check-input { margin-top: 7px; }
+    .form-option .btn-remove { color: #dc3545; }
+    .form-control, .form-check-input {
+      background-color: inherit;
+      color: inherit;
+    }
+    [data-theme="dark"] .modal-content {
+      background-color: var(--card-dark);
+      color: var(--text-dark);
+    }
+    
+    .question-card {
+      position: relative;
+    }
+
+    .btn-remove-question {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: none;
+      border: none;
+      color: #dc3545;
+      font-size: 1.2rem;
+      opacity: 0;
+      transition: all 0.3s ease;
+      cursor: pointer;
+      z-index: 10;
+    }
+
+    .question-card:hover .btn-remove-question {
+      opacity: 1;
+    }
+
+    .btn-remove-question:hover {
+      color: #c82333;
+      transform: scale(1.1);
+    }
+  </style>
+</head>
+<body>
+  <nav class="navbar px-4 py-3 d-flex justify-content-between align-items-center">
+    <span class="navbar-brand mb-0 h1">🛠️ Edit Quiz</span>
+    <div class="d-flex gap-2">
+      <button class="modern-btn" onclick="goBack()">⬅ Back</button>
+      <button class="modern-btn btn-success-modern" onclick="saveQuiz()">💾 Save Quiz</button>
+      <i class="bi bi-moon-stars-fill theme-icon" onclick="toggleTheme()"></i>
+    </div>
+  </nav>
+
+  <div class="container">
+    <div id="quizInfo" class="mb-4">
+      <h2 id="quizTitle">Quiz Title</h2>
+      <p id="quizDescription">Quiz description goes here...</p>
+      <div class="d-flex align-items-center gap-3 mb-3">
+        <div class="badge bg-primary fs-6 px-3 py-2">
+          <i class="bi bi-question-circle me-2"></i>
+          Total Questions: <span id="totalQuestionsCount">0</span>
+        </div>
+        <button class="modern-btn btn-outline-modern" onclick="showQuizInfoModal()">Edit Quiz Info</button>
+      </div>
+    </div>
+    <div id="questionList"></div>
+    <button class="btn btn-floating" onclick="showQuestionModal()">+</button>
+  </div>
+
+  <!-- Quiz Info Modal -->
+  <div class="modal fade" id="quizInfoModal" tabindex="-1">
+    <div class="modal-dialog">
+      <form class="modal-content" id="quizInfoForm">
+        <div class="modal-header">
+          <h5 class="modal-title">Quiz Info</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <label class="form-label">Title</label>
+          <input type="text" id="editQuizTitle" class="form-control mb-3" required>
+          <label class="form-label">Description</label>
+          <textarea id="editQuizDescription" class="form-control mb-3" rows="2"></textarea>
+          <label class="form-label">Duration (minutes)</label>
+          <input type="number" id="editQuizDuration" class="form-control mb-3" min="1" value="60">
+          <label class="form-label">Total Marks</label>
+          <input type="number" id="editQuizTotalMarks" class="form-control mb-3" min="0" value="0">
+          <div class="form-check">
+            <input type="checkbox" id="editQuizPrivate" class="form-check-input">
+            <label class="form-check-label" for="editQuizPrivate">Private Quiz</label>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="modern-btn" data-bs-dismiss="modal">Cancel</button>
+          <button type="submit" class="modern-btn btn-success-modern">Save</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Question Modal -->
+  <div class="modal fade" id="questionModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+      <form class="modal-content" id="questionForm" enctype="multipart/form-data">
+        <div class="modal-header">
+          <h5 class="modal-title">Add Question</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <input type="hidden" id="qId">
+          <div class="mb-3">
+            <label>Question Text</label>
+            <textarea id="qText" class="form-control" rows="2" required></textarea>
+          </div>
+          <div class="mb-3">
+            <label>Media (image/video)</label>
+            <input type="file" id="qMedia" accept="image/*,video/*">
+          </div>
+          <div class="mb-3">
+            <label>Answer Options</label>
+            <div id="optionsContainer"></div>
+            <button type="button" class="modern-btn btn-outline-modern" onclick="addOption()">+ Add Option</button>
+          </div>
+          <div class="form-check mb-2">
+            <input type="checkbox" id="allowMultiple" class="form-check-input">
+            <label class="form-check-label" for="allowMultiple">Multiple Correct Answers?</label>
+          </div>
+          <div class="form-check">
+            <input type="checkbox" id="requireMedia" class="form-check-input">
+            <label class="form-check-label" for="requireMedia">Require Media?</label>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="modern-btn" data-bs-dismiss="modal">Cancel</button>
+          <button type="submit" class="modern-btn btn-success-modern">Save Question</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    let quiz = { _id: "", title: "", description: "" };
+    let quizId = "";
+    let editingQ = null;
+
+    function toggleTheme() {
+      const html = document.documentElement;
+      const next = html.getAttribute("data-theme") === "dark" ? "light" : "dark";
+      html.setAttribute("data-theme", next);
+      localStorage.setItem("theme", next);
+    }
+
+    function goBack() {
+      window.location.href = "admin-dashboard.html";
+    }
+
+    function addOption(value = "", checked = false) {
+      const container = document.getElementById("optionsContainer");
+      const wrapper = document.createElement("div");
+      wrapper.className = "form-option";
+      wrapper.innerHTML = `
+        <input type="checkbox" class="form-check-input me-2" ${checked ? "checked" : ""}>
+        <input type="text" class="form-control" value="${value}" required>
+        <button type="button" class="btn btn-sm btn-remove"><i class="bi bi-x-circle"></i></button>
+      `;
+      wrapper.querySelector(".btn-remove").onclick = () => wrapper.remove();
+      container.appendChild(wrapper);
+    }
+
+    function showQuizInfoModal() {
+      document.getElementById("editQuizTitle").value = quiz.title;
+      document.getElementById("editQuizDescription").value = quiz.description;
+      document.getElementById("editQuizDuration").value = quiz.duration || 60;
+      document.getElementById("editQuizTotalMarks").value = quiz.totalMarks || 0;
+      document.getElementById("editQuizPrivate").checked = quiz.isPrivate || false;
+      new bootstrap.Modal(document.getElementById("quizInfoModal")).show();
+    }
+
+    document.getElementById("quizInfoForm").addEventListener("submit", async e => {
+      e.preventDefault();
+      quiz.title = document.getElementById("editQuizTitle").value;
+      quiz.description = document.getElementById("editQuizDescription").value;
+      quiz.duration = parseInt(document.getElementById("editQuizDuration").value) || 60;
+      quiz.totalMarks = parseInt(document.getElementById("editQuizTotalMarks").value) || 0;
+      quiz.isPrivate = document.getElementById("editQuizPrivate").checked;
+      
+      // Update the display
+      document.getElementById("quizTitle").textContent = quiz.title;
+      document.getElementById("quizDescription").textContent = quiz.description;
+      
+      // Save the quiz data to the server
+      try {
+        const res = await fetch(`/api/quiz/edit/${quizId}`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            title: quiz.title,
+            description: quiz.description,
+            duration: quiz.duration,
+            totalMarks: quiz.totalMarks,
+            isPrivate: quiz.isPrivate
+          })
+        });
+        
+        const responseData = await res.json();
+        
+        if (res.ok) {
+          alert("✅ Quiz info updated!");
+        } else {
+          alert(`❌ Failed to update quiz: ${responseData.error || "Unknown error"}`);
+        }
+      } catch (error) {
+        console.error("Error updating quiz info:", error);
+        alert(`❌ Error updating quiz: ${error.message}`);
+      }
+      
+      bootstrap.Modal.getInstance(document.getElementById("quizInfoModal")).hide();
+    });
+
+    function showQuestionModal(q = null) {
+      editingQ = q;
+      document.getElementById("qId").value = q? q._id : "";
+      document.getElementById("qText").value = q?.text || "";
+      document.getElementById("requireMedia").checked = q?.requireMedia || false;
+      document.getElementById("allowMultiple").checked = q?.multiple || false;
+      document.getElementById("optionsContainer").innerHTML = "";
+      (q?.options || [""]).forEach(opt => addOption(opt, q?.correctAnswers?.includes(opt)));
+      document.getElementById("qMedia").value = ""; // reset file input
+      
+      // Update modal title based on whether we're editing or adding
+      document.querySelector("#questionModal .modal-title").textContent = q ? "Edit Question" : "Add Question";
+      
+      new bootstrap.Modal(document.getElementById("questionModal")).show();
+    }
+
+    document.getElementById("questionForm").addEventListener("submit", async e => {
+      e.preventDefault();
+      
+      try {
+        console.log("Submitting question form...");
+        
+        const formData = new FormData();
+        const questionId = document.getElementById("qId").value;
+        
+        formData.append("text", document.getElementById("qText").value);
+        formData.append("multiple", document.getElementById("allowMultiple").checked);
+        formData.append("requireMedia", document.getElementById("requireMedia").checked);
+        
+        const media = document.getElementById("qMedia").files[0];
+        if (media) {
+          console.log("Adding media file:", media.name);
+          formData.append("media", media);
+        }
+
+        const optionEls = document.querySelectorAll("#optionsContainer .form-option");
+        const options = Array.from(optionEls).map(opt => opt.querySelector("input[type=\"text\"]").value);
+        const correctAnswers = Array.from(optionEls)
+          .filter(opt => opt.querySelector("input[type=\"checkbox\"]").checked)
+          .map(opt => opt.querySelector("input[type=\"text\"]").value);
+
+        console.log("Options:", options);
+        console.log("Correct answers:", correctAnswers);
+
+        formData.append("options", JSON.stringify(options));
+        formData.append("correctAnswers", JSON.stringify(correctAnswers));
+
+        // Determine if we're editing or adding a new question
+        let url, method;
+        if (questionId) {
+          // Editing existing question
+          url = `/api/question/edit/${questionId}`;
+          method = "PUT";
+          console.log("Editing question with ID:", questionId);
+        } else {
+          // Adding new question
+          url = `/api/question/save/${quizId}`;
+          method = "POST";
+          console.log("Adding new question to quiz:", quizId);
+        }
+
+        const res = await fetch(url, {
+          method: method,
+          body: formData
+        });
+        
+        const responseData = await res.json();
+        console.log("Server response:", responseData);
+        
+        if (res.ok) {
+          alert(questionId ? "✅ Question updated!" : "✅ Question saved!");
+          loadQuizData();
+          bootstrap.Modal.getInstance(document.getElementById("questionModal")).hide();
+        } else {
+          console.error("Server error:", responseData);
+          alert(`❌ Failed to ${questionId ? 'update' : 'save'} question: ${responseData.error || "Unknown error"}`);
+        }
+      } catch (error) {
+        console.error("Error submitting question:", error);
+        alert(`❌ Error ${questionId ? 'updating' : 'saving'} question: ${error.message}`);
+      }
+    });
+
+    async function loadQuizData() {
+      try {
+        console.log("Fetching quiz and questions for ID:", quizId);
+        
+        // Fetch quiz info
+        const quizRes = await fetch(`/api/quiz/${quizId}`);
+        if (!quizRes.ok) {
+          throw new Error(`Failed to fetch quiz: ${quizRes.status}`);
+        }
+        const quizData = await quizRes.json();
+        quiz = quizData;
+        document.getElementById("quizTitle").textContent = quiz.title;
+        document.getElementById("quizDescription").textContent = quiz.description;
+        
+        // Fetch questions separately
+        const questionsRes = await fetch(`/api/question/quiz/${quizId}`);
+        if (!questionsRes.ok) {
+          throw new Error(`Failed to fetch questions: ${questionsRes.status}`);
+        }
+        const questions = await questionsRes.json();
+        console.log("Fetched questions:", questions);
+        renderQuestions(questions);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+        alert(`Error loading quiz data: ${error.message}`);
+      }
+    }
+
+    function renderQuestions(questions) {
+      const container = document.getElementById("questionList");
+      container.innerHTML = "";
+      questions.forEach(q => {
+        const card = document.createElement("div");
+        card.className = "question-card p-3 position-relative";
+        const correct = q.correctAnswers?.join(", ");
+        card.innerHTML = `
+          <div class="question-content">
+            <p><strong>${q.text}</strong></p>
+            ${q.mediaUrl ? `<p><img src="${q.mediaUrl}" alt="media" style="max-width:100%;max-height:200px"/></p>` : ""}
+            <small><em>Correct: ${correct}</em></small><br/>
+            <small>${q.options.join(", ")}</small>
+            <div class="mt-2">
+              <button class="modern-btn btn-outline-modern btn-sm me-2" onclick="editQuestion('${q._id}')" title="Edit Question">
+                <i class="bi bi-pencil"></i> Edit
+              </button>
+            </div>
+          </div>
+          <button class="btn-remove-question" onclick="removeQuestion('${q._id}')" title="Remove Question">
+            <i class="bi bi-x-circle-fill"></i>
+          </button>
+        `;
+        container.appendChild(card);
+      });
+      
+      // Update total questions count after rendering
+      updateTotalQuestionsCount();
+    }
+
+    async function editQuestion(questionId) {
+      try {
+        // Fetch the question data from the server
+        const res = await fetch(`/api/question/${questionId}`);
+        if (!res.ok) {
+          throw new Error(`Failed to fetch question: ${res.status}`);
+        }
+        
+        const question = await res.json();
+        console.log("Editing question:", question);
+        
+        // Populate the modal with existing question data
+        editingQ = question;
+        document.getElementById("qId").value = question._id;
+        document.getElementById("qText").value = question.text || "";
+        document.getElementById("requireMedia").checked = question.requireMedia || false;
+        document.getElementById("allowMultiple").checked = question.multiple || false;
+        
+        // Clear and populate options
+        document.getElementById("optionsContainer").innerHTML = "";
+        if (question.options && question.options.length > 0) {
+          question.options.forEach(opt => {
+            const isCorrect = question.correctAnswers && question.correctAnswers.includes(opt);
+            addOption(opt, isCorrect);
+          });
+        } else {
+          addOption("", false); // Add at least one empty option
+        }
+        
+        // Reset file input
+        document.getElementById("qMedia").value = "";
+        
+        // Update modal title
+        document.querySelector("#questionModal .modal-title").textContent = "Edit Question";
+        
+        // Show the modal
+        new bootstrap.Modal(document.getElementById("questionModal")).show();
+      } catch (error) {
+        console.error("Error fetching question for edit:", error);
+        alert(`❌ Error loading question: ${error.message}`);
+      }
+    }
+
+    async function removeQuestion(questionId) {
+      if (!confirm("Are you sure you want to delete this question? This action cannot be undone.")) {
+        return;
+      }
+
+      try {
+        const res = await fetch(`/api/question/${questionId}`, {
+          method: "DELETE"
+        });
+
+        if (res.ok) {
+          alert("✅ Question deleted successfully!");
+          // Reload questions to update the display
+          await loadQuizData();
+        } else {
+          const errorData = await res.json();
+          alert(`❌ Failed to delete question: ${errorData.error || "Unknown error"}`);
+        }
+      } catch (error) {
+        console.error("Error deleting question:", error);
+        alert("❌ Error deleting question. Please try again.");
+      }
+    }
+
+    async function saveQuiz() {
+      try {
+        console.log("Saving quiz:", quiz);
+        
+        const res = await fetch(`/api/quiz/edit/${quizId}`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ 
+            title: quiz.title, 
+            description: quiz.description,
+            duration: quiz.duration || 60,
+            totalMarks: quiz.totalMarks || 0,
+            isPrivate: quiz.isPrivate
+          })
+        });
+        
+        const responseData = await res.json();
+        console.log("Quiz save response:", responseData);
+        
+        if (res.ok) {
+          alert("✅ Quiz updated!");
+        } else {
+          console.error("Quiz save error:", responseData);
+          alert(`❌ Failed to update quiz: ${responseData.error || "Unknown error"}`);
+        }
+      } catch (error) {
+        console.error("Error saving quiz:", error);
+        alert(`❌ Error updating quiz: ${error.message}`);
+      }
+    }
+
+    function updateTotalQuestionsCount() {
+      const questionCards = document.querySelectorAll('.question-card');
+      const count = questionCards.length;
+      document.getElementById('totalQuestionsCount').textContent = count;
+    }
+
+    async function loadQuizData() {
+      try {
+        // Load quiz info
+        const quizRes = await fetch(`/api/quiz/${quizId}`);
+        if (!quizRes.ok) {
+          throw new Error(`Failed to load quiz: ${quizRes.status}`);
+        }
+        quiz = await quizRes.json();
+        
+        // Update display
+        document.getElementById("quizTitle").textContent = quiz.title;
+        document.getElementById("quizDescription").textContent = quiz.description;
+        
+        // Load questions
+        const questionsRes = await fetch(`/api/question/quiz/${quizId}`);
+        if (!questionsRes.ok) {
+          throw new Error(`Failed to load questions: ${questionsRes.status}`);
+        }
+        const questions = await questionsRes.json();
+        
+        // Render questions
+        renderQuestions(questions);
+        
+        // Update total questions count
+        updateTotalQuestionsCount();
+        
+      } catch (error) {
+        console.error("Error loading quiz data:", error);
+        alert(`❌ Error loading quiz: ${error.message}`);
+      }
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+      quizId = new URLSearchParams(location.search).get("id");
+      if (!quizId) return alert("Quiz ID missing from URL");
+      document.documentElement.setAttribute("data-theme", localStorage.getItem("theme") || "light");
+      loadQuizData();
+    });
+  </script>
+</body>
+</html>
+
