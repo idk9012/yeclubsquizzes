@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Forgot Password</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"/>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet"/>
+  <style>
+    :root {
+      --bg-light: #f8f9fc;
+      --bg-dark: #1a1a1a;
+      --card-light: #ffffff;
+      --card-dark: #2c2c2c;
+      --text-light: #212529;
+      --text-dark: #eaeaea;
+      --primary: #4facfe;
+      --primary-hover: #007bff;
+    }
+
+    [data-theme="light"] body {
+      background: linear-gradient(to right, #4facfe, #00f2fe);
+      color: var(--text-light);
+    }
+
+    [data-theme="dark"] body {
+      background-color: var(--bg-dark);
+      color: var(--text-dark);
+    }
+
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      transition: background 0.4s ease, color 0.4s ease;
+    }
+
+    .card {
+      padding: 2rem;
+      border-radius: 16px;
+      background-color: var(--card-light);
+      box-shadow: 0 15px 25px rgba(0, 0, 0, 0.1);
+      width: 100%;
+      max-width: 400px;
+      text-align: center;
+      transition: background 0.3s ease, color 0.3s ease;
+      position: relative;
+    }
+
+    [data-theme="dark"] .card {
+      background-color: var(--card-dark);
+      color: var(--text-dark);
+    }
+
+    .btn-primary {
+      background-color: var(--primary);
+      border: none;
+      transition: background 0.3s ease;
+    }
+
+    .btn-primary:hover {
+      background-color: var(--primary-hover);
+    }
+
+    .theme-toggle {
+      position: absolute;
+      top: 15px;
+      right: 20px;
+      font-size: 1.3rem;
+      cursor: pointer;
+      color: #fff;
+      transition: transform 0.3s ease;
+    }
+
+    [data-theme="dark"] .theme-toggle {
+      color: #f1f1f1;
+    }
+
+    .theme-toggle:hover {
+      transform: rotate(20deg);
+    }
+
+    .toast-container {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 1050;
+    }
+
+    .spinner-border {
+      width: 1.2rem;
+      height: 1.2rem;
+      margin-left: 8px;
+    }
+  </style>
+</head>
+<body>
+  <i class="bi bi-moon-stars-fill theme-toggle" onclick="toggleTheme()"></i>
+
+  <div class="card">
+    <h3>Forgot Password</h3>
+    <p>Enter your registered email. We'll send you a reset code.</p>
+
+    <form id="forgotForm">
+      <input type="email" id="email" placeholder="Enter your email" class="form-control mb-3" required />
+      <button class="btn btn-primary w-100" type="submit">
+        Send Code
+        <span class="spinner-border d-none" role="status" id="spinner"></span>
+      </button>
+    </form>
+
+    <p class="mt-3">
+      <a href="index.html">Back to Login</a>
+    </p>
+  </div>
+
+  <!-- Toast Container -->
+  <div class="toast-container position-fixed top-0 end-0 p-3" id="toastHolder"></div>
+
+  <script>
+    function toggleTheme() {
+      const html = document.documentElement;
+      const current = html.getAttribute('data-theme');
+      const next = current === 'dark' ? 'light' : 'dark';
+      html.setAttribute('data-theme', next);
+      localStorage.setItem('theme', next);
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      const saved = localStorage.getItem('theme') || 'light';
+      document.documentElement.setAttribute('data-theme', saved);
+    });
+
+    const form = document.getElementById('forgotForm');
+    const spinner = document.getElementById('spinner');
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const email = document.getElementById('email').value;
+      spinner.classList.remove('d-none');
+
+      const res = await fetch('/api/auth/forgot-password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email })
+      });
+
+      const data = await res.json();
+      spinner.classList.add('d-none');
+
+      if (res.ok) {
+        showToast('✅ Reset code sent to your email', 'success');
+        localStorage.setItem('resetEmail', email);
+        setTimeout(() => window.location.href = 'reset.html', 1000);
+      } else {
+        showToast(data.error || 'Something went wrong', 'danger');
+      }
+    });
+
+    function showToast(msg, type = 'info') {
+      const toast = document.createElement('div');
+      toast.className = `toast align-items-center text-bg-${type} border-0 show`;
+      toast.role = 'alert';
+      toast.innerHTML = `
+        <div class="d-flex">
+          <div class="toast-body">${msg}</div>
+          <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+        </div>
+      `;
+      document.getElementById('toastHolder').appendChild(toast);
+      setTimeout(() => toast.remove(), 5000);
+    }
+  </script>
+</body>
+</html>

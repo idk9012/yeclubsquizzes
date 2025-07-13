@@ -1,0 +1,843 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Quiz Review</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"/>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet"/>
+  <style>
+    :root {
+      --bg-light: #f8f9fc;
+      --bg-dark: #121212;
+      --card-bg-light: #ffffff;
+      --card-bg-dark: #1e1e2e;
+      --text-light: #212529;
+      --text-dark: #e0e0e0;
+      --nav-bg-light: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      --nav-bg-dark: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+      --border-light: #dee2e6;
+      --border-dark: #444;
+      --correct-color: #00b894;
+      --incorrect-color: #e17055;
+      --unanswered-color: #74b9ff;
+      --accent-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+    }
+
+    [data-theme="light"] body {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: var(--text-light);
+      min-height: 100vh;
+    }
+
+    [data-theme="dark"] body {
+      background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+      color: var(--text-dark);
+      min-height: 100vh;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      transition: all 0.3s ease;
+      animation: fadeIn 0.8s ease-out;
+      margin: 0;
+      padding: 0;
+    }
+
+    @keyframes fadeIn {
+      0% { opacity: 0; transform: translateY(20px); }
+      100% { opacity: 1; transform: translateY(0); }
+    }
+
+    .navbar {
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(15px);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+      animation: slideDown 0.6s ease-out;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    }
+
+    @keyframes slideDown {
+      from { transform: translateY(-100%); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+
+    .modern-btn {
+      background: rgba(255, 255, 255, 0.2);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      color: white;
+      padding: 10px 20px;
+      border-radius: 25px;
+      transition: all 0.3s ease;
+      backdrop-filter: blur(10px);
+      font-weight: 600;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .modern-btn:hover {
+      background: rgba(255, 255, 255, 0.3);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+      color: white;
+    }
+
+    .theme-icon {
+      font-size: 1.4rem;
+      color: white;
+      cursor: pointer;
+      transition: transform 0.3s ease;
+    }
+
+    .theme-icon:hover {
+      transform: rotate(20deg) scale(1.1);
+    }
+
+    .review-container {
+      max-width: 1200px;
+      margin: 2rem auto;
+      padding: 0 20px;
+    }
+
+    .review-header {
+      background: rgba(255, 255, 255, 0.95);
+      border-radius: 20px;
+      padding: 2rem;
+      margin-bottom: 2rem;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      animation: cardSlideUp 0.6s ease-out;
+      text-align: center;
+    }
+
+    [data-theme="dark"] .review-header {
+      background: rgba(30, 30, 46, 0.95);
+      color: var(--text-dark);
+    }
+
+    @keyframes cardSlideUp {
+      from { opacity: 0; transform: translateY(30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1.5rem;
+      margin: 2rem 0;
+    }
+
+    .stat-card {
+      background: rgba(255, 255, 255, 0.95);
+      border-radius: 15px;
+      padding: 1.5rem;
+      text-align: center;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      transition: all 0.3s ease;
+      animation: statCardPop 0.6s ease-out;
+      animation-fill-mode: both;
+    }
+
+    [data-theme="dark"] .stat-card {
+      background: rgba(30, 30, 46, 0.95);
+      color: var(--text-dark);
+    }
+
+    .stat-card:hover {
+      transform: translateY(-5px) scale(1.02);
+      box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+    }
+
+    @keyframes statCardPop {
+      from { opacity: 0; transform: scale(0.8) translateY(20px); }
+      to { opacity: 1; transform: scale(1) translateY(0); }
+    }
+
+    .stat-card:nth-child(1) { animation-delay: 0.1s; }
+    .stat-card:nth-child(2) { animation-delay: 0.2s; }
+    .stat-card:nth-child(3) { animation-delay: 0.3s; }
+    .stat-card:nth-child(4) { animation-delay: 0.4s; }
+
+    .stat-icon {
+      font-size: 2.5rem;
+      margin-bottom: 0.5rem;
+      display: block;
+    }
+
+    .stat-number {
+      font-size: 2rem;
+      font-weight: bold;
+      margin-bottom: 0.5rem;
+    }
+
+    .stat-label {
+      font-size: 0.9rem;
+      opacity: 0.8;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .correct-stat { color: var(--correct-color); }
+    .incorrect-stat { color: var(--incorrect-color); }
+    .unanswered-stat { color: var(--unanswered-color); }
+    .total-stat { 
+      background: var(--accent-gradient);
+      color: white;
+    }
+
+    .questions-container {
+      display: flex;
+      flex-direction: column;
+      gap: 2rem;
+    }
+
+    .question-card {
+      background: rgba(255, 255, 255, 0.95);
+      border-radius: 20px;
+      padding: 2rem;
+      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      transition: all 0.3s ease;
+      animation: questionSlideIn 0.6s ease-out;
+      animation-fill-mode: both;
+      position: relative;
+      overflow: hidden;
+    }
+
+    [data-theme="dark"] .question-card {
+      background: rgba(30, 30, 46, 0.95);
+      color: var(--text-dark);
+    }
+
+    .question-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 20px 45px rgba(0, 0, 0, 0.15);
+    }
+
+    @keyframes questionSlideIn {
+      from { opacity: 0; transform: translateX(-30px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+
+    .question-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 1.5rem;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .question-number {
+      background: var(--accent-gradient);
+      color: white;
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-weight: bold;
+      font-size: 0.9rem;
+    }
+
+    .status-badge {
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-weight: bold;
+      font-size: 0.9rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .status-correct {
+      background: linear-gradient(135deg, #00b894, #00cec9);
+      color: white;
+    }
+
+    .status-incorrect {
+      background: linear-gradient(135deg, #e17055, #d63031);
+      color: white;
+    }
+
+    .status-unanswered {
+      background: linear-gradient(135deg, #74b9ff, #0984e3);
+      color: white;
+    }
+
+    .question-text {
+      font-size: 1.2rem;
+      font-weight: 600;
+      margin-bottom: 1.5rem;
+      line-height: 1.6;
+    }
+
+    .question-media {
+      text-align: center;
+      margin: 1.5rem 0;
+    }
+
+    .question-media img, .question-media video {
+      max-width: 100%;
+      max-height: 300px;
+      border-radius: 15px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    }
+
+    .options-section {
+      margin: 1.5rem 0;
+    }
+
+    .section-title {
+      font-size: 1rem;
+      font-weight: bold;
+      margin-bottom: 1rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      opacity: 0.8;
+    }
+
+    .option-item {
+      background: rgba(248, 249, 250, 0.8);
+      border: 2px solid transparent;
+      border-radius: 12px;
+      padding: 12px 16px;
+      margin: 8px 0;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    [data-theme="dark"] .option-item {
+      background: rgba(45, 55, 72, 0.8);
+    }
+
+    .option-correct {
+      background: linear-gradient(135deg, rgba(0, 184, 148, 0.1), rgba(0, 206, 201, 0.1));
+      border-color: var(--correct-color);
+      color: var(--correct-color);
+    }
+
+    .option-user-correct {
+      background: linear-gradient(135deg, rgba(0, 184, 148, 0.2), rgba(0, 206, 201, 0.2));
+      border-color: var(--correct-color);
+      color: var(--correct-color);
+      font-weight: bold;
+    }
+
+    .option-user-incorrect {
+      background: linear-gradient(135deg, rgba(225, 112, 85, 0.1), rgba(214, 48, 49, 0.1));
+      border-color: var(--incorrect-color);
+      color: var(--incorrect-color);
+      font-weight: bold;
+    }
+
+    .option-icon {
+      font-size: 1.2rem;
+      min-width: 20px;
+    }
+
+    .back-to-quiz-btn {
+      position: fixed;
+      bottom: 30px;
+      right: 30px;
+      background: var(--accent-gradient);
+      color: white;
+      border: none;
+      padding: 15px 25px;
+      border-radius: 50px;
+      font-weight: bold;
+      font-size: 1rem;
+      cursor: pointer;
+      box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+      transition: all 0.3s ease;
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      animation: floatIn 0.8s ease-out;
+    }
+
+    .back-to-quiz-btn:hover {
+      transform: translateY(-3px) scale(1.05);
+      box-shadow: 0 15px 40px rgba(102, 126, 234, 0.6);
+    }
+
+    @keyframes floatIn {
+      from { opacity: 0; transform: translateY(100px) scale(0.8); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    .loading-spinner {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 200px;
+      font-size: 1.2rem;
+    }
+
+    .spinner {
+      width: 40px;
+      height: 40px;
+      border: 4px solid rgba(102, 126, 234, 0.3);
+      border-top: 4px solid #667eea;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin-right: 15px;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .error-message {
+      background: linear-gradient(135deg, #e17055, #d63031);
+      color: white;
+      padding: 2rem;
+      border-radius: 15px;
+      text-align: center;
+      margin: 2rem 0;
+      animation: shake 0.5s ease-in-out;
+    }
+
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-5px); }
+      75% { transform: translateX(5px); }
+    }
+
+    /* Mobile Responsiveness */
+    @media (max-width: 768px) {
+      .review-container {
+        margin: 1rem auto;
+        padding: 0 15px;
+      }
+
+      .review-header {
+        padding: 1.5rem;
+        border-radius: 15px;
+      }
+
+      .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1rem;
+      }
+
+      .stat-card {
+        padding: 1rem;
+      }
+
+      .stat-icon {
+        font-size: 2rem;
+      }
+
+      .stat-number {
+        font-size: 1.5rem;
+      }
+
+      .question-card {
+        padding: 1.5rem;
+        border-radius: 15px;
+      }
+
+      .question-header {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .question-text {
+        font-size: 1.1rem;
+      }
+
+      .back-to-quiz-btn {
+        bottom: 20px;
+        right: 20px;
+        padding: 12px 20px;
+        font-size: 0.9rem;
+      }
+
+      .modern-btn {
+        padding: 8px 16px;
+        font-size: 0.9rem;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .stats-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .question-card {
+        padding: 1rem;
+      }
+
+      .option-item {
+        padding: 10px 12px;
+        font-size: 0.9rem;
+      }
+
+      .back-to-quiz-btn {
+        position: relative;
+        bottom: auto;
+        right: auto;
+        margin: 2rem auto;
+        display: flex;
+        justify-content: center;
+      }
+    }
+
+    /* Animations for better UX */
+    .fade-in {
+      animation: fadeIn 0.6s ease-out;
+    }
+
+    .slide-up {
+      animation: slideUp 0.6s ease-out;
+    }
+
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .pulse {
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+    }
+  </style>
+</head>
+<body>
+  <nav class="navbar px-3 py-3 d-flex justify-content-between align-items-center">
+    <a class="navbar-brand text-white fw-bold" href="dashboard.html">
+      <i class="bi bi-mortarboard-fill me-2"></i>Quiz Review
+    </a>
+    <div class="d-flex align-items-center gap-3">
+      <a href="quizzes.html" class="modern-btn">
+        <i class="bi bi-arrow-left"></i>Back to Quizzes
+      </a>
+      <i class="bi bi-moon-stars-fill theme-icon" onclick="toggleTheme()"></i>
+    </div>
+  </nav>
+
+  <div class="review-container">
+    <!-- Loading State -->
+    <div id="loadingState" class="loading-spinner">
+      <div class="spinner"></div>
+      Loading your quiz review...
+    </div>
+
+    <!-- Error State -->
+    <div id="errorState" class="error-message d-none">
+      <h4><i class="bi bi-exclamation-triangle me-2"></i>Error Loading Review</h4>
+      <p id="errorMessage">Failed to load quiz review data.</p>
+    </div>
+
+    <!-- Review Content -->
+    <div id="reviewContent" class="d-none">
+      <!-- Header -->
+      <div class="review-header">
+        <h1 id="quizTitle" class="mb-3">Quiz Review</h1>
+        <p id="quizDescription" class="mb-4 text-muted"></p>
+        <div class="d-flex justify-content-center align-items-center gap-4 flex-wrap">
+          <div class="text-center">
+            <div class="h4 mb-1" id="finalScore">0%</div>
+            <small class="text-muted">Final Score</small>
+          </div>
+          <div class="text-center">
+            <div class="h6 mb-1" id="submittedDate">-</div>
+            <small class="text-muted">Submitted</small>
+          </div>
+        </div>
+      </div>
+
+      <!-- Statistics -->
+      <div class="stats-grid" id="statsGrid">
+        <div class="stat-card total-stat">
+          <span class="stat-icon">📊</span>
+          <div class="stat-number" id="totalQuestions">0</div>
+          <div class="stat-label">Total Questions</div>
+        </div>
+        <div class="stat-card correct-stat">
+          <span class="stat-icon">✅</span>
+          <div class="stat-number" id="correctCount">0</div>
+          <div class="stat-label">Correct</div>
+        </div>
+        <div class="stat-card incorrect-stat">
+          <span class="stat-icon">❌</span>
+          <div class="stat-number" id="incorrectCount">0</div>
+          <div class="stat-label">Incorrect</div>
+        </div>
+        <div class="stat-card unanswered-stat">
+          <span class="stat-icon">❓</span>
+          <div class="stat-number" id="unansweredCount">0</div>
+          <div class="stat-label">Unanswered</div>
+        </div>
+      </div>
+
+      <!-- Questions -->
+      <div class="questions-container" id="questionsContainer">
+        <!-- Questions will be dynamically inserted here -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Floating Back Button -->
+  <button class="back-to-quiz-btn" onclick="goBackToQuizzes()">
+    <i class="bi bi-arrow-left"></i>
+    Back to Quizzes
+  </button>
+
+  <script>
+    let reviewData = null;
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      // Set theme
+      document.documentElement.setAttribute('data-theme', localStorage.getItem('theme') || 'light');
+      
+      // Get quiz ID and user ID from URL parameters
+      const urlParams = new URLSearchParams(window.location.search);
+      const quizId = urlParams.get('quizId');
+      let userId = localStorage.getItem('userId');
+      
+      // If no userId in localStorage, try to get it from URL params or use a fallback
+      if (!userId) {
+        userId = urlParams.get('userId');
+      }
+      
+      if (!quizId) {
+        showError('Missing quiz ID. Please return to the quiz list.');
+        return;
+      }
+      
+      if (!userId) {
+        // Try to load review data without userId (for testing purposes)
+        await loadReviewDataByQuiz(quizId);
+      } else {
+        await loadReviewData(userId, quizId);
+      }
+    });
+
+    async function loadReviewData(userId, quizId) {
+      try {
+        const response = await fetch(`/api/submission/review-latest/${quizId}?userId=${userId}`);
+        
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
+        reviewData = await response.json();
+        displayReviewData();
+        
+      } catch (error) {
+        console.error('Failed to load review data:', error);
+        showError('Failed to load quiz review. Please try again later.');
+      }
+    }
+
+    async function loadReviewDataByQuiz(quizId) {
+      try {
+        // Try to get the latest submission for this quiz
+        const response = await fetch(`/api/submission/review-latest/${quizId}`);
+        
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
+        reviewData = await response.json();
+        displayReviewData();
+        
+      } catch (error) {
+        console.error('Failed to load review data:', error);
+        showError('Failed to load quiz review. Please try again later.');
+      }
+    }
+
+    function displayReviewData() {
+      // Hide loading state
+      document.getElementById('loadingState').classList.add('d-none');
+      
+      // Show review content
+      document.getElementById('reviewContent').classList.remove('d-none');
+      
+      // Set quiz information
+      document.getElementById('quizTitle').textContent = reviewData.quiz.title;
+      document.getElementById('quizDescription').textContent = reviewData.quiz.description;
+      document.getElementById('finalScore').textContent = `${reviewData.statistics.percentage}%`;
+      document.getElementById('submittedDate').textContent = new Date(reviewData.submission.submittedAt).toLocaleDateString();
+      
+      // Set statistics
+      document.getElementById('totalQuestions').textContent = reviewData.statistics.totalQuestions;
+      document.getElementById('correctCount').textContent = reviewData.statistics.correctCount;
+      document.getElementById('incorrectCount').textContent = reviewData.statistics.incorrectCount;
+      document.getElementById('unansweredCount').textContent = reviewData.statistics.unansweredCount;
+      
+      // Display questions
+      displayQuestions();
+    }
+
+    function displayQuestions() {
+      const container = document.getElementById('questionsContainer');
+      container.innerHTML = '';
+      
+      reviewData.questions.forEach((question, index) => {
+        const questionCard = createQuestionCard(question, index + 1);
+        container.appendChild(questionCard);
+        
+        // Add staggered animation delay
+        setTimeout(() => {
+          questionCard.style.animationDelay = `${index * 0.1}s`;
+        }, 100);
+      });
+    }
+
+    function createQuestionCard(question, questionNumber) {
+      const card = document.createElement('div');
+      card.className = 'question-card';
+      card.style.animationDelay = `${questionNumber * 0.1}s`;
+      
+      const statusIcon = getStatusIcon(question.status);
+      const statusClass = `status-${question.status}`;
+      
+      card.innerHTML = `
+        <div class="question-header">
+          <div class="question-number">Question ${questionNumber}</div>
+          <div class="status-badge ${statusClass}">
+            ${statusIcon}
+            ${question.status.charAt(0).toUpperCase() + question.status.slice(1)}
+          </div>
+        </div>
+        
+        <div class="question-text">${question.text}</div>
+        
+        ${question.mediaUrl ? `
+          <div class="question-media">
+            ${question.mediaUrl.match(/\.(mp4|webm|ogg)$/i) ? 
+              `<video controls><source src="${question.mediaUrl}" type="video/mp4"></video>` :
+              `<img src="${question.mediaUrl}" alt="Question media">`
+            }
+          </div>
+        ` : ''}
+        
+        <div class="options-section">
+          <div class="section-title">Answer Options</div>
+          ${createOptionsHTML(question)}
+        </div>
+        
+        ${question.status !== 'unanswered' ? `
+          <div class="options-section">
+            <div class="section-title">Your Answer${question.userAnswers.length > 1 ? 's' : ''}</div>
+            ${createUserAnswersHTML(question)}
+          </div>
+        ` : ''}
+        
+        <div class="options-section">
+          <div class="section-title">Correct Answer${question.correctAnswers.length > 1 ? 's' : ''}</div>
+          ${createCorrectAnswersHTML(question)}
+        </div>
+      `;
+      
+      return card;
+    }
+
+    function createOptionsHTML(question) {
+      return question.options.map(option => {
+        const isCorrect = question.correctAnswers.includes(option);
+        const isUserAnswer = question.userAnswers.includes(option);
+        
+        let optionClass = 'option-item';
+        let icon = '<i class="bi bi-circle option-icon"></i>';
+        
+        if (isUserAnswer && isCorrect) {
+          optionClass += ' option-user-correct';
+          icon = '<i class="bi bi-check-circle-fill option-icon"></i>';
+        } else if (isUserAnswer && !isCorrect) {
+          optionClass += ' option-user-incorrect';
+          icon = '<i class="bi bi-x-circle-fill option-icon"></i>';
+        } else if (isCorrect) {
+          optionClass += ' option-correct';
+          icon = '<i class="bi bi-check-circle option-icon"></i>';
+        }
+        
+        return `
+          <div class="${optionClass}">
+            ${icon}
+            <span>${option}</span>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function createUserAnswersHTML(question) {
+      if (question.userAnswers.length === 0) {
+        return '<div class="option-item"><i class="bi bi-dash-circle option-icon"></i><span>No answer provided</span></div>';
+      }
+      
+      return question.userAnswers.map(answer => {
+        const isCorrect = question.correctAnswers.includes(answer);
+        const optionClass = isCorrect ? 'option-user-correct' : 'option-user-incorrect';
+        const icon = isCorrect ? 
+          '<i class="bi bi-check-circle-fill option-icon"></i>' : 
+          '<i class="bi bi-x-circle-fill option-icon"></i>';
+        
+        return `
+          <div class="option-item ${optionClass}">
+            ${icon}
+            <span>${answer}</span>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function createCorrectAnswersHTML(question) {
+      return question.correctAnswers.map(answer => `
+        <div class="option-item option-correct">
+          <i class="bi bi-check-circle-fill option-icon"></i>
+          <span>${answer}</span>
+        </div>
+      `).join('');
+    }
+
+    function getStatusIcon(status) {
+      switch (status) {
+        case 'correct':
+          return '<i class="bi bi-check-circle-fill"></i>';
+        case 'incorrect':
+          return '<i class="bi bi-x-circle-fill"></i>';
+        case 'unanswered':
+          return '<i class="bi bi-question-circle-fill"></i>';
+        default:
+          return '<i class="bi bi-circle"></i>';
+      }
+    }
+
+    function showError(message) {
+      document.getElementById('loadingState').classList.add('d-none');
+      document.getElementById('errorMessage').textContent = message;
+      document.getElementById('errorState').classList.remove('d-none');
+    }
+
+    function toggleTheme() {
+      const html = document.documentElement;
+      const theme = html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+      html.setAttribute('data-theme', theme);
+      localStorage.setItem('theme', theme);
+    }
+
+    function goBackToQuizzes() {
+      window.location.href = 'quizzes.html';
+    }
+  </script>
+</body>
+</html>
+

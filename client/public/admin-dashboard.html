@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Admin Dashboard</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet" />
+  <style>
+    :root {
+      --bg-light: #f8f9fc;
+      --bg-dark: #121212;
+      --card-bg-light: #ffffff;
+      --card-bg-dark: #1e1e2e;
+      --text-light: #212529;
+      --text-dark: #e0e0e0;
+      --nav-bg-light: linear-gradient(to right, #4e73df, #224abe);
+      --nav-bg-dark: linear-gradient(to right, #333, #111);
+      --menu-bg-light: #ffffff;
+      --menu-bg-dark: #2c2c2c;
+      --border-light: #dee2e6;
+      --border-dark: #444;
+    }
+
+    [data-theme="light"] body {
+      background-color: var(--bg-light);
+      color: var(--text-light);
+    }
+
+    [data-theme="dark"] body {
+      background-color: var(--bg-dark);
+      color: var(--text-dark);
+    }
+
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      transition: background-color 0.3s ease, color 0.3s ease;
+      animation: fadeIn 0.5s ease-out;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .navbar {
+      background: var(--nav-bg-light);
+      animation: slideDown 0.4s ease;
+    }
+
+    @keyframes slideDown {
+      from { transform: translateY(-100%); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+
+    [data-theme="dark"] .navbar {
+      background: var(--nav-bg-dark);
+    }
+
+    .navbar-brand, .nav-link {
+      color: white !important;
+    }
+
+    .theme-icon {
+      font-size: 1.4rem;
+      color: white;
+      cursor: pointer;
+      transition: transform 0.3s ease;
+    }
+
+    .theme-icon:hover {
+      transform: rotate(20deg);
+    }
+
+    .navbar-nav {
+      display: flex;
+      flex-direction: row;
+      gap: 1rem;
+      align-items: center;
+      margin-bottom: 0;
+    }
+
+    .navbar .d-flex.align-items-center {
+      gap: 0.75rem;
+    }
+
+    @media (max-width: 768px) {
+      .navbar-nav {
+        display: none !important;
+      }
+      .menu-toggle, .theme-icon {
+        display: inline-block;
+        color: white;
+        background: none;
+        border: none;
+        font-size: 1.6rem;
+        transition: transform 0.3s ease;
+      }
+      .menu-toggle.clicked {
+        transform: rotate(90deg);
+      }
+      .custom-menu {
+        display: block;
+        position: absolute;
+        right: 1rem;
+        top: 60px;
+        background-color: var(--menu-bg-light);
+        border-radius: 10px;
+        padding: 1rem;
+        min-width: 180px;
+        transform: scale(0.9) translateY(-10px);
+        opacity: 0;
+        pointer-events: none;
+        transition: transform 0.3s ease, opacity 0.3s ease;
+        z-index: 1000;
+        animation: menuPop 0.3s ease-in-out;
+        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.15);
+      }
+      @keyframes menuPop {
+        from { transform: scale(0.85) translateY(-20px); opacity: 0; }
+        to { transform: scale(1) translateY(0); opacity: 1; }
+      }
+      [data-theme="dark"] .custom-menu {
+        background-color: var(--menu-bg-dark);
+        box-shadow: 0 5px 20px rgba(255, 255, 255, 0.05);
+      }
+      .custom-menu.show {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+        pointer-events: auto;
+      }
+      .custom-menu a {
+        display: block;
+        color: inherit;
+        text-decoration: none;
+        margin: 0.5rem 0;
+        font-weight: 500;
+        transition: color 0.2s ease;
+        padding: 0.5rem;
+        border-radius: 5px;
+      }
+      .custom-menu a:hover {
+        color: #0d6efd;
+        background-color: rgba(13, 110, 253, 0.1);
+      }
+    }
+
+    @media (min-width: 769px) {
+      .menu-toggle, .custom-menu {
+        display: none !important;
+      }
+    }
+
+    .btn-add {
+      margin-bottom: 20px;
+    }
+
+    .quiz-card {
+      border: 1px solid var(--border-light);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    [data-theme="dark"] .quiz-card {
+      background-color: var(--card-bg-dark);
+      color: var(--text-dark);
+      border-color: var(--border-dark);
+    }
+
+    [data-theme="light"] .quiz-card {
+      background-color: var(--card-bg-light);
+      color: var(--text-light);
+    }
+
+    .quiz-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+    }
+
+    /* MODAL SYNCED TO DARK MODE */
+    [data-theme="dark"] .modal-content {
+      background-color: var(--card-bg-dark);
+      color: var(--text-dark);
+    }
+
+    [data-theme="dark"] .form-control {
+      background-color: #2a2a2a;
+      color: var(--text-dark);
+      border: 1px solid var(--border-dark);
+    }
+
+    [data-theme="dark"] .form-control::placeholder {
+      color: #aaa;
+    }
+
+    [data-theme="dark"] label {
+      color: var(--text-dark);
+    }
+  </style>
+</head>
+<body>
+  <nav class="navbar px-3 py-2">
+    <div class="container-fluid d-flex justify-content-between align-items-center">
+      <a class="navbar-brand" href="#">🛠️ Admin Panel</a>
+      <div class="d-flex align-items-center">
+        <ul class="navbar-nav flex-row gap-3 d-none d-md-flex" id="mainNavLinks">
+          <li class="nav-item"><a class="nav-link" href="admin-dashboard.html">Dashboard</a></li>
+          <li class="nav-item"><a class="nav-link" href="messages.html">💬 Messages</a></li>
+          <li class="nav-item"><a class="nav-link" href="#" onclick="logout()">Logout</a></li>
+        </ul>
+        <button class="menu-toggle d-md-none" id="menuToggle"><i class="bi bi-list"></i></button>
+        <i class="bi bi-moon-stars-fill theme-icon ms-2" onclick="toggleTheme()"></i>
+      </div>
+    </div>
+    <div class="custom-menu d-md-none" id="customMenu">
+      <a href="admin-dashboard.html">Dashboard</a>
+      <a href="messages.html">💬 Messages</a>
+      <a href="#" onclick="logout()">Logout</a>
+    </div>
+  </nav>
+
+  <main class="container py-5">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <h3>📚 Quizzes</h3>
+      <button class="btn btn-primary btn-add" onclick="showAddModal()">➕ Add Quiz</button>
+    </div>
+
+    <div class="row" id="quizList">
+      <!-- Quiz cards dynamically inserted here -->
+    </div>
+  </main>
+
+  <!-- Add/Edit Modal -->
+  <div class="modal fade" id="quizModal" tabindex="-1" aria-labelledby="quizModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <form class="modal-content" id="quizForm">
+        <div class="modal-header">
+          <h5 class="modal-title" id="quizModalLabel">Add Quiz</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <input type="hidden" id="quizId" />
+          <div class="mb-3">
+            <label class="form-label">Quiz Title</label>
+            <input type="text" class="form-control" id="title" required />
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Description</label>
+            <textarea class="form-control" id="description" rows="3" required></textarea>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Duration (minutes)</label>
+            <input type="number" class="form-control" id="duration" min="1" />
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Total Marks</label>
+            <input type="number" class="form-control" id="totalMarks" min="1" />
+          </div>
+          <div class="form-check form-switch mb-2">
+            <input class="form-check-input" type="checkbox" id="isPrivate" />
+            <label class="form-check-label" for="isPrivate">Private Quiz</label>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button type="submit" class="btn btn-success">Save Quiz</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Statistics Modal -->
+  <div class="modal fade" id="statisticsModal" tabindex="-1" aria-labelledby="statisticsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="statisticsModalLabel">Quiz Statistics</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <h6 id="statisticsQuizTitle">Quiz Title</h6>
+            <div class="d-flex gap-2">
+              <select class="form-select form-select-sm" id="sortOrder" onchange="sortStatistics()">
+                <option value="highest">Highest to Lowest</option>
+                <option value="lowest">Lowest to Highest</option>
+                <option value="name">Name (A-Z)</option>
+                <option value="date">Date Submitted</option>
+              </select>
+            </div>
+          </div>
+          <div id="statisticsContent">
+            <p class="text-center">Loading statistics...</p>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          <button type="button" class="btn btn-primary" onclick="exportStatistics()">📥 Export CSV</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+let quizzes = [];
+let currentStatistics = [];
+let currentQuizId = '';
+
+async function fetchQuizzes() {
+  try {
+    const res = await fetch('/api/admin/quizzes');
+    const data = await res.json();
+    quizzes = data;
+    renderQuizzes();
+  } catch (err) {
+    console.error('❌ Failed to load quizzes:', err);
+  }
+}
+
+async function showStatistics(quizId, quizTitle) {
+  currentQuizId = quizId;
+  document.getElementById('statisticsQuizTitle').textContent = quizTitle;
+  document.getElementById('statisticsContent').innerHTML = '<p class="text-center">Loading statistics...</p>';
+  
+  try {
+    const res = await fetch(`/api/admin/quiz/${quizId}/statistics`);
+    const data = await res.json();
+    currentStatistics = data;
+    renderStatistics();
+    new bootstrap.Modal(document.getElementById('statisticsModal')).show();
+  } catch (err) {
+    console.error('❌ Failed to load statistics:', err);
+    document.getElementById('statisticsContent').innerHTML = '<p class="text-center text-danger">Failed to load statistics</p>';
+  }
+}
+
+function renderStatistics() {
+  const content = document.getElementById('statisticsContent');
+  
+  if (currentStatistics.length === 0) {
+    content.innerHTML = '<p class="text-center text-muted">No submissions yet for this quiz.</p>';
+    return;
+  }
+
+  const totalStudents = currentStatistics.length;
+  const averageScore = (currentStatistics.reduce((sum, stat) => sum + stat.score, 0) / totalStudents).toFixed(2);
+  const maxScore = Math.max(...currentStatistics.map(stat => stat.score));
+  const minScore = Math.min(...currentStatistics.map(stat => stat.score));
+
+  content.innerHTML = `
+    <div class="row mb-4">
+      <div class="col-md-3">
+        <div class="card text-center">
+          <div class="card-body">
+            <h5 class="card-title text-primary">${totalStudents}</h5>
+            <p class="card-text">Total Students</p>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="card text-center">
+          <div class="card-body">
+            <h5 class="card-title text-success">${averageScore}</h5>
+            <p class="card-text">Average Score</p>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="card text-center">
+          <div class="card-body">
+            <h5 class="card-title text-warning">${maxScore}</h5>
+            <p class="card-text">Highest Score</p>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="card text-center">
+          <div class="card-body">
+            <h5 class="card-title text-danger">${minScore}</h5>
+            <p class="card-text">Lowest Score</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="table-responsive">
+      <table class="table table-striped">
+        <thead>
+          <tr>
+            <th>Student Name</th>
+            <th>Score</th>
+            <th>Percentage</th>
+            <th>Date Submitted</th>
+          </tr>
+        </thead>
+        <tbody id="statisticsTableBody">
+          ${currentStatistics.map(stat => `
+            <tr>
+              <td>${stat.userName}</td>
+              <td>${stat.score}</td>
+              <td>${stat.totalQuestions > 0 ? ((stat.score / stat.totalQuestions) * 100).toFixed(1) : '0.0'}%</td>
+              <td>${new Date(stat.submittedAt).toLocaleDateString()}</td>
+            </tr>
+          `).join('')}
+        </tbody>
+      </table>
+    </div>
+  `;
+}
+
+function sortStatistics() {
+  const sortOrder = document.getElementById('sortOrder').value;
+  
+  switch (sortOrder) {
+    case 'highest':
+      currentStatistics.sort((a, b) => b.score - a.score);
+      break;
+    case 'lowest':
+      currentStatistics.sort((a, b) => a.score - b.score);
+      break;
+    case 'name':
+      currentStatistics.sort((a, b) => a.userName.localeCompare(b.userName));
+      break;
+    case 'date':
+      currentStatistics.sort((a, b) => new Date(b.submittedAt) - new Date(a.submittedAt));
+      break;
+  }
+  
+  renderStatistics();
+}
+
+function exportStatistics() {
+  if (currentStatistics.length === 0) {
+    alert('No data to export');
+    return;
+  }
+
+  const csvContent = [
+    ['Student Name', 'Score', 'Percentage', 'Date Submitted'],
+    ...currentStatistics.map(stat => [
+      stat.userName,
+      stat.score,
+      ((stat.totalQuestions > 0 ? (stat.score / stat.totalQuestions) * 100 : 0).toFixed(1)) + '%',
+      new Date(stat.submittedAt).toLocaleDateString()
+    ])
+  ].map(row => row.join(',')).join('\n');
+
+  const blob = new Blob([csvContent], { type: 'text/csv' });
+  const url = window.URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `quiz_statistics_${currentQuizId}.csv`;
+  a.click();
+  window.URL.revokeObjectURL(url);
+}
+
+function renderQuizzes() {
+  const list = document.getElementById('quizList');
+  list.innerHTML = quizzes.map(q => `
+    <div class="col-md-6 col-lg-4 mb-4">
+      <div class="card quiz-card p-3">
+        <h5>${q.title}</h5>
+        <p>${q.description}</p>
+        <p><strong>Duration:</strong> ${q.duration || 'N/A'} min</p>
+        <p><strong>Total Marks:</strong> ${q.totalMarks || 'N/A'}</p>
+        <p><strong>Privacy:</strong> ${q.isPrivate ? 'Private' : 'Public'}</p>
+        <div class="d-flex flex-wrap gap-2">
+          <button class="btn btn-sm btn-outline-primary" onclick='showEditModal(${JSON.stringify(q)})'>🖋 Interface</button>
+          <button class="btn btn-sm btn-outline-warning" onclick='location.href="editquiz.html?id=${q._id}"'>🧠 Edit Quiz</button>
+          <button class="btn btn-sm btn-outline-info" onclick='showStatistics("${q._id}", "${q.title}")'>📊 View Statistics</button>
+          <button class="btn btn-sm btn-outline-danger" onclick='deleteQuiz("${q._id}")'>🗑 Delete</button>
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function showAddModal() {
+  document.getElementById('quizForm').reset();
+  document.getElementById('quizId').value = '';
+  document.getElementById('quizModalLabel').textContent = 'Add Quiz';
+  new bootstrap.Modal(document.getElementById('quizModal')).show();
+}
+
+function showEditModal(quiz) {
+  document.getElementById('quizModalLabel').textContent = 'Edit Quiz';
+  document.getElementById('quizId').value = quiz._id;
+  document.getElementById('title').value = quiz.title;
+  document.getElementById('description').value = quiz.description;
+  document.getElementById('duration').value = quiz.duration || '';
+  document.getElementById('totalMarks').value = quiz.totalMarks || '';
+  document.getElementById('isPrivate').checked = quiz.isPrivate || false;
+  new bootstrap.Modal(document.getElementById('quizModal')).show();
+}
+
+document.getElementById('quizForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const id = document.getElementById('quizId').value;
+  const payload = {
+    title: document.getElementById('title').value,
+    description: document.getElementById('description').value,
+    duration: document.getElementById('duration').value,
+    totalMarks: document.getElementById('totalMarks').value,
+    isPrivate: document.getElementById('isPrivate').checked
+  };
+
+  const url = id ? `/api/admin/quiz/${id}` : '/api/admin/quiz';
+  const method = id ? 'PUT' : 'POST';
+
+  try {
+    const res = await fetch(url, {
+      method,
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+
+    if (!res.ok) throw new Error(await res.text());
+    await fetchQuizzes();
+    bootstrap.Modal.getInstance(document.getElementById('quizModal')).hide();
+  } catch (err) {
+    console.error('❌ Failed to save quiz:', err);
+  }
+});
+
+async function deleteQuiz(id) {
+  if (!confirm('Are you sure you want to delete this quiz?')) return;
+  try {
+    await fetch(`/api/admin/quiz/${id}`, { method: 'DELETE' });
+    await fetchQuizzes();
+  } catch (err) {
+    console.error('❌ Failed to delete quiz:', err);
+  }
+}
+
+function toggleTheme() {
+  const html = document.documentElement;
+  const theme = html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+  html.setAttribute('data-theme', theme);
+  localStorage.setItem('theme', theme);
+}
+
+function logout() {
+  localStorage.clear();
+  window.location.href = 'index.html';
+}
+
+window.addEventListener('DOMContentLoaded', () => {
+  // Admin access control - redirect non-admin users
+  const userRole = localStorage.getItem('userRole');
+  console.log('Current userRole:', userRole); // Debug log
+  
+  // Allow access if userRole is 'admin' or if no role is set (for backward compatibility)
+  if (userRole && userRole !== 'admin') {
+    console.log('Redirecting non-admin user to dashboard');
+    window.location.href = 'dashboard.html';
+    return;
+  }
+
+  document.documentElement.setAttribute('data-theme', localStorage.getItem('theme') || 'light');
+  fetchQuizzes();
+
+  // Mobile menu functionality
+  const toggle = document.getElementById('menuToggle');
+  const menu = document.getElementById('customMenu');
+  
+  if (toggle && menu) {
+    toggle.addEventListener('click', (e) => {
+      menu.classList.toggle('show');
+      toggle.classList.toggle('clicked');
+      e.stopPropagation();
+    });
+    
+    document.addEventListener('click', (e) => {
+      if (!toggle.contains(e.target) && !menu.contains(e.target)) {
+        menu.classList.remove('show');
+        toggle.classList.remove('clicked');
+      }
+    });
+  }
+});
+</script>
+
+
+</body>
+</html>
