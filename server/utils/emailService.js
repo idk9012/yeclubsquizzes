@@ -2,10 +2,9 @@ const nodemailer = require('nodemailer');
 
 // Create transporter using Gmail
 const createTransporter = () => {
-  return nodemailer.createTransporter({
-    service: 'gmail',
-    host: process.env.MAIL_HOST || 'smtp.gmail.com',
-    port: process.env.MAIL_PORT || 465,
+  return nodemailer.createTransport({ 
+    host: process.env.MAIL_HOST ,
+    port: process.env.MAIL_PORT ,
     secure: true, // Use SSL
     auth: {
       user: process.env.MAIL_USER, // Gmail address used for verification codes
@@ -68,4 +67,3 @@ const sendEmailReply = async (studentEmail, studentName, subject, replyMessage, 
 module.exports = {
   sendEmailReply
 };
-

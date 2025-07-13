@@ -6,6 +6,7 @@ const cors = require('cors');
 const uploadRoutes = require('./routes/upload');
 const questionRoutes = require('./routes/question');
 const submissionRoutes = require('./routes/submission');
+const emailRoutes = require('./routes/email');
 dotenv.config({ path: path.join(__dirname, '../.env') });
 
 const app = express();
@@ -32,6 +33,7 @@ app.use('/api/upload', require('./routes/upload'));
 app.use('/api/messages', require('./routes/messages'));
 app.use('/api/user', require('./routes/user'));
 app.use('/api/submission', submissionRoutes);
+app.use('/api/email', emailRoutes);
 
 // Leaderboard endpoint
 app.get('/api/leaderboard', async (req, res) => {

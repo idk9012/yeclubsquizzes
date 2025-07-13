@@ -7,22 +7,11 @@ const { sendEmailReply } = require('../utils/emailService');
 router.post('/send', async (req, res) => {
   try {
     const { name, email, subject, message, userId } = req.body;
-    
     if (!name || !email || !subject || !message || !userId) {
       return res.status(400).json({ error: 'All fields are required' });
     }
-    
-    const newMessage = new Message({
-      name,
-      email,
-      subject,
-      message,
-      userId
-    });
-    
+    const newMessage = new Message({ name, email, subject, message, userId });
     await newMessage.save();
-    console.log('New message saved:', newMessage);
-    
     res.json({ message: 'Message sent successfully', id: newMessage._id });
   } catch (error) {
     console.error('Error saving message:', error);
@@ -36,7 +25,6 @@ router.get('/', async (req, res) => {
     const messages = await Message.find({})
       .populate('userId', 'name email')
       .sort({ createdAt: -1 });
-    
     res.json(messages);
   } catch (error) {
     console.error('Error fetching messages:', error);
@@ -49,27 +37,15 @@ router.post('/:messageId/reply', async (req, res) => {
   try {
     const { messageId } = req.params;
     const { message } = req.body;
-    
-    if (!message) {
-      return res.status(400).json({ error: 'Reply message is required' });
-    }
-    
+    if (!message) return res.status(400).json({ error: 'Reply message is required' });
+
     const messageDoc = await Message.findById(messageId);
-    if (!messageDoc) {
-      return res.status(404).json({ error: 'Message not found' });
-    }
-    
-    // Add reply to the message
-    messageDoc.replies.push({
-      message,
-      createdAt: new Date()
-      // adminId can be added here if you implement admin authentication
-    });
-    
+    if (!messageDoc) return res.status(404).json({ error: 'Message not found' });
+
+    messageDoc.replies.push({ message, createdAt: new Date() });
     messageDoc.replied = true;
     await messageDoc.save();
-    
-    // Send email reply to the student
+
     try {
       const emailResult = await sendEmailReply(
         messageDoc.email,
@@ -78,22 +54,28 @@ router.post('/:messageId/reply', async (req, res) => {
         message,
         messageDoc.message
       );
-      
-      if (emailResult.success) {
-        console.log('Email reply sent successfully to:', messageDoc.email);
-      } else {
-        console.error('Failed to send email reply:', emailResult.error);
-      }
-    } catch (emailError) {
-      console.error('Error sending email reply:', emailError);
-      // Don't fail the request if email fails, just log the error
+      if (!emailResult.success) console.error('Email send error:', emailResult.error);
+    } catch (emailErr) {
+      console.error('Email service failed:', emailErr);
     }
-    
-    console.log('Reply added to message:', messageId);
+
     res.json({ message: 'Reply sent successfully' });
   } catch (error) {
-    console.error('Error sending reply:', error);
+    console.error('Reply error:', error);
     res.status(500).json({ error: 'Failed to send reply' });
+  }
+});
+
+// Delete a message (admin)
+router.delete('/:messageId', async (req, res) => {
+  try {
+    const { messageId } = req.params;
+    const deleted = await Message.findByIdAndDelete(messageId);
+    if (!deleted) return res.status(404).json({ error: 'Message not found' });
+    res.json({ message: 'Message deleted successfully' });
+  } catch (error) {
+    console.error('Delete error:', error);
+    res.status(500).json({ error: 'Failed to delete message' });
   }
 });
 
@@ -101,16 +83,12 @@ router.post('/:messageId/reply', async (req, res) => {
 router.get('/user/:userId', async (req, res) => {
   try {
     const { userId } = req.params;
-    
-    const messages = await Message.find({ userId })
-      .sort({ createdAt: -1 });
-    
+    const messages = await Message.find({ userId }).sort({ createdAt: -1 });
     res.json(messages);
   } catch (error) {
-    console.error('Error fetching user messages:', error);
+    console.error('User messages error:', error);
     res.status(500).json({ error: 'Failed to load messages' });
   }
 });
 
 module.exports = router;
-
